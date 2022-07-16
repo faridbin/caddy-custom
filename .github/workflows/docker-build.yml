@@ -1,0 +1,49 @@
+name: docker-build
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  multi-arch-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+            
+      - name: Login to DockerHub
+        uses: docker/login-action@v2 
+        with:
+          username: nomjiwa
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          
+      - name: Get Latest Tag
+        id: previoustag
+        uses: WyriHaximus/github-action-get-previous-tag@1.0.0
+        
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64,linux/386,linux/arm64,linux/arm/v7,linux/arm/v6,linux/s390x,linux/ppc64le
+          push: true
+          tags: |
+            nomjiwa/caddy-custom:latest
+            nomjiwa/caddy-custom:${{ steps.previoustag.outputs.tag }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
