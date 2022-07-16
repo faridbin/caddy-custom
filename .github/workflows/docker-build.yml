@@ -31,9 +31,9 @@ jobs:
           username: nomjiwa
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           
-      - name: Get Latest Tag
+      - name: Get Previous tag
         id: previoustag
-        uses: WyriHaximus/github-action-get-previous-tag@1.0.0
+        uses: WyriHaximus/github-action-get-previous-tag@v1
         with:
           fallback: 2.5.2
         
