@@ -1,10 +1,10 @@
-FROM caddy:builder-alpine as builder
+FROM caddy:2.5.2-builder-alpine as builder
 
 RUN xcaddy build \
 --with github.com/caddy-dns/cloudflare \
 --with github.com/lolPants/caddy-requestid
 
-FROM caddy:alpine
+FROM caddy:2.5.2-alpine
 
 RUN apk --no-cache add curl
 
